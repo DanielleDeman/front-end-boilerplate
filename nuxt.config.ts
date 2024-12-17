@@ -2,6 +2,19 @@ import { pwa } from './app/config/pwa'
 import { appDescription } from './app/constants/index'
 
 export default defineNuxtConfig({
+  ignore: ['**/*.test.*', '**/*.spec.*'], // Ignore test files
+  vite: {
+    build: {
+      rollupOptions: {
+        external: [/\.test\.[jt]sx?$/, /\.spec\.[jt]sx?$/], // Exclude test files via Vite
+      },
+    },
+  },
+  typescript: {
+    tsConfig: {
+      exclude: ['**/*.test.ts', '**/*.spec.ts'], // Exclude from TypeScript
+    },
+  },
   modules: [
     '@vueuse/nuxt',
     '@pinia/nuxt',
@@ -11,6 +24,7 @@ export default defineNuxtConfig({
     'nuxt-api-party',
     '@nuxt/content',
     '@nuxt/image',
+    '@nuxt/test-utils/module',
   ],
 
   experimental: {
