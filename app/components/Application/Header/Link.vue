@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { RouteLocationAsPathGeneric, RouteLocationAsRelativeGeneric } from 'vue-router'
+
 const props = defineProps<{
-  to: string
+  to: string | RouteLocationAsRelativeGeneric | RouteLocationAsPathGeneric
   label: string
 }>()
 </script>

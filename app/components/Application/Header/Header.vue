@@ -4,10 +4,16 @@
       <nav>
         <ul class="flex gap-2">
           <li>
-            <ApplicationHeaderLink to="/" label="Home" />
+            <ApplicationHeaderLink :to="{ name: 'index' }" label="Home" />
           </li>
           <li>
-            <ApplicationHeaderLink to="/assignment" label="Read the assignment instructions" />
+            <ApplicationHeaderLink :to="{ name: 'assignment' }" label="Read the assignment instructions" />
+          </li>
+          <li>
+            <ApplicationHeaderLink :to="{ name: 'pokemon' }" label="Pokemon" />
+          </li>
+          <li>
+            <ApplicationHeaderLink :to="{ name: 'rick-and-morty' }" label="Rick and Morty" />
           </li>
         </ul>
       </nav>
