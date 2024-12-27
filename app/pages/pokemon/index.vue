@@ -1,45 +1,108 @@
 <script setup lang="ts">
 import type { PokeAPI } from 'pokeapi-types'
-import useFetchPokemonDetails from '~/composables/useFetchPokemonDetails'
+import ContentCard from '~/components/Content/Card/Card.vue'
+import ContentCardMinimal from '~/components/Content/Card/Minimal.vue'
+import LayoutGrid from '~/components/Layout/Grid.vue'
+import LayoutList from '~/components/Layout/List.vue'
 import { maxPaginationPages } from '~/constants'
+import { useLayoutStore } from '~/store/layout'
 import { usePokemonStore } from '~/store/pokemon'
+import { LayoutTyping } from '~/types/ui'
 
-const { pokemonByName, pokemonByPage } = usePokemonStore()
 const currentPage = ref(1)
+
+// Stores
+const { pokemonByPage } = usePokemonStore()
+const layoutStore = useLayoutStore()
+
+// Fetch the pokemon for the current page
+const {
+  pokemonNames,
+  pokemonCount,
+  status,
+} = await useFetchPokemonNames(currentPage)
+
+const {
+  status: statusDetails,
+} = await useFetchPokemonDetails(pokemonNames, currentPage)
+
+// The merged status of the pokemon and pokemon details requests
+const {
+  mergedStatus,
+} = useMergedStatus([status, statusDetails])
 
 // The array of pokemon for the current page
 const currentPagePokemon: ComputedRef<PokeAPI.Pokemon[]> = computed(() =>
   pokemonByPage.get(currentPage.value) || [])
 
-// Fetch the pokemon for the current page
-async function fetchPokemonForPage(): Promise<void> {
-  const pagePokemonNames: string[] = await useFetchPokemonNames(currentPage.value)
-  await useFetchPokemonDetails(pagePokemonNames, currentPage.value)
-}
-
-// Watch for changes in the current page
-watch(() => currentPage.value, () => {
-  if (!pokemonByPage.has(currentPage.value)) {
-    fetchPokemonForPage()
-  }
-})
+// The active tab and component
+const activeLayout = computed(() =>
+  layoutStore.layout === LayoutTyping.Grid ? LayoutGrid : LayoutList,
+)
+// The card component is not coupled to the layout component so you can use the same layout component with different card components
+const activeCard = computed(() =>
+  layoutStore.layout === LayoutTyping.Grid ? ContentCard : ContentCardMinimal,
+)
 </script>
 
 <template>
   <div>
-    <h1>Pokemon</h1>
-    <UCard v-for="pokemon in currentPagePokemon" :key="`pokemon-card-${pokemon.name}`">
-      <template #header>
-        <h2>{{ pokemon.name }}</h2>
-      </template>
-    </UCard>
+    <UContainer>
+      <div class="flex justify-between my-8">
+        <h1 class="text-3xl">
+          Pokémon
+        </h1>
+        <LayoutToggle />
+      </div>
 
-    <UPagination
-      v-model="currentPage"
-      :max="maxPaginationPages"
-      :total="pokemonByName.size"
-      show-last
-      show-first
-    />
+      <ApplicationStatus
+        v-if="mergedStatus !== 'success'"
+        :status="mergedStatus"
+      />
+
+      <template v-else>
+        <component :is="activeLayout" :items="currentPagePokemon" layout-index="pokemon" class="my-4">
+          <template #default="{ item }">
+            <component :is="activeCard" :to="{ name: 'pokemon-name', params: { name: item?.name } }">
+              <template #title>
+                <h2>{{ item?.name ?? 'Pokemon' }}</h2>
+              </template>
+              <template #image>
+                <img
+                  v-if="item?.sprites?.other?.dream_world?.front_default"
+                  :src="item.sprites.other.dream_world.front_default"
+                  alt=""
+                  class="max-h-full"
+                >
+              </template>
+              <template #content>
+                <div v-if="item?.types?.length" class="flex space-x-3">
+                  <span>types:</span>
+                  <template
+                    v-for="(type, index) in item.types"
+                  >
+                    <span
+                      v-if="type?.type?.name"
+                      :key="`${item.id}-${type.type.name}-${index}`"
+                      class="space-x-3"
+                    >
+                      {{ type.type.name }}
+                    </span>
+                  </template>
+                </div>
+              </template>
+            </component>
+          </template>
+        </component>
+
+        <UPagination
+          v-model="currentPage"
+          :max="maxPaginationPages"
+          :page-count="maxPaginationPages"
+          :total="pokemonCount"
+          class="my-4"
+        />
+      </template>
+    </UContainer>
   </div>
 </template>

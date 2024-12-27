@@ -2,7 +2,10 @@ import type { PokeAPI } from 'pokeapi-types'
 
 // The multiple of Pokémon is Pokémon
 export const usePokemonStore = defineStore('pokemon', {
-  state: () => ({
+  state: (): {
+    pokemonByName: Map<string, PokeAPI.Pokemon>
+    pokemonByPage: Map<number, PokeAPI.Pokemon[]>
+  } => ({
     /**
      * If we use the name we can also use the name in the url which is good for seo
      * Since the name is part of the API url we can assume it's unique
@@ -35,22 +38,25 @@ export const usePokemonStore = defineStore('pokemon', {
     },
 
     // Action to populate maps from an array of Pokémon
-    addPokemonList(pokemonList: PokeAPI.Pokemon[], page = 1) {
+    addPokemonList(newPokemon: PokeAPI.Pokemon[], namesOnPage: string[], page = 1) {
       // Ensure the page number is valid
       if (page < 1) {
-        console.error('Invalid page number at addPokemonList in pokemon store', page)
+        console.error('Invalid page number at addPokemonToPage in pokemon store', page)
         return
       }
 
-      // Ensure the Pokémon list is not empty
-      if (pokemonList?.length) {
-        // Add the Pokémon to the page map
-        this.pokemonByPage.set(page, pokemonList)
-
-        for (const pokemon of pokemonList) {
+      // If there are any Pokemon that are not already in the store, add them
+      if (newPokemon?.length) {
+        // Add the Pokémon details to the store
+        for (const pokemon of newPokemon) {
           this.addPokemon(pokemon)
         }
       }
+      // Once all new pokemon have been added to the store, set up the page
+      this.pokemonByPage.set(page, namesOnPage.flatMap(name =>
+        this.hasPokemonWithName(name)
+          ? [this.getPokemonByName(name) as PokeAPI.Pokemon]
+          : []))
     },
   },
 })

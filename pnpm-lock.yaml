@@ -14,6 +14,9 @@ importers:
       '@antfu/eslint-config':
         specifier: ^3.8.0
         version: 3.8.0(@typescript-eslint/utils@8.13.0(eslint@9.14.0(jiti@2.4.0))(typescript@5.6.3))(@vue/compiler-sfc@3.5.13)(eslint-plugin-format@0.1.2(eslint@9.14.0(jiti@2.4.0)))(eslint@9.14.0(jiti@2.4.0))(typescript@5.6.3)(vitest@2.1.8(@types/node@22.9.0)(happy-dom@15.11.7)(terser@5.36.0))
+      '@iconify-json/icon-park-solid':
+        specifier: ^1.2.2
+        version: 1.2.2
       '@nuxt/content':
         specifier: ^2.13.4
         version: 2.13.4(ioredis@5.4.1)(magicast@0.3.5)(nuxt@3.14.0(@parcel/watcher@2.5.0)(@types/node@22.9.0)(eslint@9.14.0(jiti@2.4.0))(ioredis@5.4.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.24.4)(terser@5.36.0)(typescript@5.6.3)(vite@5.4.11(@types/node@22.9.0)(terser@5.36.0))(vue-tsc@2.1.10(typescript@5.6.3)))(rollup@4.24.4)(vue@3.5.12(typescript@5.6.3))
@@ -1108,6 +1111,9 @@ packages:
 
   '@iconify-json/heroicons@1.2.1':
     resolution: {integrity: sha512-TkKfS5U27kE5MXmSGLzPoz95BP5VA9xEJXwJFwmPMVLX+xyWq0OkoiWTUXB0uAoQODpb8BaRpzSydItrq9fIRA==}
+
+  '@iconify-json/icon-park-solid@1.2.2':
+    resolution: {integrity: sha512-CVIe1+WMb3axWWrZ4Yt9/ZAbF8UEYnQ77Zt+DooLuA5VxVcea9eVzFnmuNZ8UVgQ7lt2y8ZHU2VGI6BylLeYCA==}
 
   '@iconify/collections@1.0.479':
     resolution: {integrity: sha512-0JYCyV4G60Wi0vOLasTsGsM98f+EkKbZAhsTRCj8uCDzJTguayM+nhWLgG0sSQdDif1KqlGMh3mS+4dB3njqWg==}
@@ -7447,6 +7453,10 @@ snapshots:
   '@humanwhocodes/retry@0.4.1': {}
 
   '@iconify-json/heroicons@1.2.1':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify-json/icon-park-solid@1.2.2':
     dependencies:
       '@iconify/types': 2.0.0
 

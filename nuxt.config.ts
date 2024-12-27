@@ -3,6 +3,7 @@ import { appDescription } from './app/constants/index'
 
 export default defineNuxtConfig({
   ignore: ['**/*.test.*', '**/*.spec.*'], // Ignore test files
+
   vite: {
     build: {
       rollupOptions: {
@@ -10,11 +11,13 @@ export default defineNuxtConfig({
       },
     },
   },
+
   typescript: {
     tsConfig: {
       exclude: ['**/*.test.ts', '**/*.spec.ts'], // Exclude from TypeScript
     },
   },
+
   modules: [
     '@vueuse/nuxt',
     '@pinia/nuxt',
@@ -26,6 +29,15 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/test-utils/module',
   ],
+
+  imports: {
+    dirs: [
+      // Scan top-level modules
+      'composables',
+      // Scan modules nested in the composables directory
+      'composables/**/*',
+    ],
+  },
 
   experimental: {
     payloadExtraction: false,
