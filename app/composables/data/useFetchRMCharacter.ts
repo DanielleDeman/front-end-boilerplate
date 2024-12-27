@@ -38,10 +38,12 @@ export default async (id: string): Promise<{
 }
 
 // Fetch Rick and Morty Character from the API with a specific id
-export async function useFetchRMCharactersByPage(page: Ref<number>): Promise<{
+export async function useFetchRMCharactersByPage(): Promise<{
   status: Ref<AsyncDataRequestStatus>
 }> {
+  const route = useRoute()
   const { addCharacterList, updateTotalCharacters, charactersByPage } = useRickAndMortyStore()
+  const page: ComputedRef<number> = computed(() => Number(route.query.page) || 1)
 
   // Fetch the Pokémon data
   const { data, error, status } = await useRickAndMortyData<Info<Character[]>>('character', {
@@ -55,17 +57,18 @@ export async function useFetchRMCharactersByPage(page: Ref<number>): Promise<{
         || nuxtApp.static.data[key]
         || (charactersByPage.get(page.value) ?? undefined) // Check if the Characters are already in the store
     },
-    watch: [page],
+  }).then((result) => {
+    if (result?.data?.value?.info?.count) {
+      // Update the total number of Characters
+      updateTotalCharacters(result.data.value.info.count)
+    }
+    return result
   })
 
   watchEffect(() => {
     if (data?.value?.results) {
       // Add the Pokémon to the store
-      addCharacterList(data.value.results)
-    }
-    if (data?.value?.info?.count) {
-      // Update the total number of Characters
-      updateTotalCharacters(data.value.info.count)
+      addCharacterList(data.value.results, page.value)
     }
   })
 

@@ -11,6 +11,9 @@ import { LayoutTyping } from '~/types/ui'
 
 const currentPage = ref(1)
 
+// Add the page query param to the URL
+usePageQueryParam(currentPage)
+
 // Stores
 const { charactersByPage, totalCharacters } = useRickAndMortyStore()
 const layoutStore = useLayoutStore()
@@ -18,7 +21,7 @@ const layoutStore = useLayoutStore()
 // Fetch the characters for the current page
 const {
   status,
-} = await useFetchRMCharactersByPage(currentPage)
+} = await useFetchRMCharactersByPage()
 
 // The array of characters for the current page
 const currentPageCharacters: ComputedRef<Character[]> = computed(() =>
@@ -76,10 +79,9 @@ const activeCard = computed(() =>
 
         <ClientOnly>
           <UPagination
-            v-if="totalCharacters && totalCharacters > charactersPerPage"
             v-model="currentPage"
             :max="maxPaginationPages"
-            :page-count="maxPaginationPages"
+            :page-count="charactersPerPage"
             :total="totalCharacters"
             class="my-12"
           />

@@ -11,6 +11,9 @@ import { LayoutTyping } from '~/types/ui'
 
 const currentPage = ref(1)
 
+// Add the page query param to the URL
+usePageQueryParam(currentPage)
+
 // Stores
 const { pokemonByPage, totalPokemon } = usePokemonStore()
 const layoutStore = useLayoutStore()
@@ -19,11 +22,11 @@ const layoutStore = useLayoutStore()
 const {
   pokemonNames,
   status,
-} = await useFetchPokemonNames(currentPage)
+} = await useFetchPokemonNames()
 
 const {
   status: statusDetails,
-} = await useFetchPokemonList(pokemonNames, currentPage)
+} = await useFetchPokemonList(pokemonNames)
 
 // The merged status of the pokemon and pokemon details requests
 const {
@@ -69,8 +72,8 @@ const activeCard = computed(() =>
               </template>
               <template #image>
                 <img
-                  v-if="item?.sprites?.other?.dream_world?.front_default"
-                  :src="item.sprites.other.dream_world.front_default"
+                  v-if="item?.sprites?.other?.dream_world?.front_default || item?.sprites?.other?.home?.front_default"
+                  :src="item.sprites.other.dream_world?.front_default ?? item.sprites.other.home?.front_default"
                   alt=""
                   class="max-h-full"
                 >
@@ -97,10 +100,9 @@ const activeCard = computed(() =>
 
         <ClientOnly>
           <UPagination
-            v-if="totalPokemon && totalPokemon > itemsPerPage"
             v-model="currentPage"
             :max="maxPaginationPages"
-            :page-count="maxPaginationPages"
+            :page-count="itemsPerPage"
             :total="totalPokemon"
             class="my-12"
           />

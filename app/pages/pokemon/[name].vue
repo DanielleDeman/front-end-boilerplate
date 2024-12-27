@@ -18,6 +18,10 @@ const {
 // The current pokemon
 const pokemon: ComputedRef<PokeAPI.Pokemon | null> = computed(() =>
   pokemonByName.get(name) ?? null)
+
+const pokemonImage: ComputedRef<string | null> = computed(() =>
+  pokemon.value?.sprites?.other?.dream_world?.front_default
+  ?? pokemon.value?.sprites?.other?.home?.front_default ?? null)
 </script>
 
 <template>
@@ -33,8 +37,8 @@ const pokemon: ComputedRef<PokeAPI.Pokemon | null> = computed(() =>
           {{ pokemon.name }}
         </h1>
         <img
-          v-if="pokemon.sprites?.other?.dream_world?.front_default"
-          :src="pokemon.sprites.other.dream_world.front_default"
+          v-if="pokemonImage"
+          :src="pokemonImage"
           alt=""
           class="w-32 h-32 my-12"
         >

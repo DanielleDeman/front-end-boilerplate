@@ -38,10 +38,11 @@ export default async (pokemonName: string): Promise<{
 }
 
 // Fetch details for multiple Pokémon from the API
-export async function useFetchPokemonList(pokemonNames: ComputedRef<string[]>, page?: Ref<number>): Promise<{
+export async function useFetchPokemonList(pokemonNames: ComputedRef<string[]>): Promise<{
   status: Ref<AsyncDataRequestStatus>
   refresh: () => Promise<void>
 }> {
+  const route = useRoute()
   const { addPokemonList, hasPokemonWithName } = usePokemonStore()
 
   // If there are any Pokémon that we do not already have in the store, fetch their details and add them to the store
@@ -61,7 +62,7 @@ export async function useFetchPokemonList(pokemonNames: ComputedRef<string[]>, p
         // Filter out any undefined results
         const newPokemon: PokeAPI.Pokemon[] = results.filter(result => result !== undefined)
         // Add the Pokémon to the store
-        addPokemonList(newPokemon, pokemonNames.value, page?.value)
+        addPokemonList(newPokemon, pokemonNames.value, Number(route.query.page))
         return newPokemon
       })
       .catch((error) => {
@@ -74,14 +75,6 @@ export async function useFetchPokemonList(pokemonNames: ComputedRef<string[]>, p
         || nuxtApp.static.data[key]
     },
     watch: [namesToString], // Watch for changes in the Pokémon names
-  })
-
-  // Handle errors
-  watchEffect(() => {
-    // Ensure the page number is valid, if there is one
-    if (page?.value && page.value <= 0) {
-      console.error('Invalid page number in useFetchPokemonDetails', page.value)
-    }
   })
 
   return {

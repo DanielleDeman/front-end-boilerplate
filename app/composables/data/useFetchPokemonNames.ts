@@ -4,12 +4,14 @@ import { itemsPerPage } from '~/constants'
 import { usePokemonStore } from '~/store/pokemon'
 
 // Fetch Pokemon names from the API for a specific page
-export default async (page: Ref<number>): Promise<{
+export default async (): Promise<{
   pokemonNames: ComputedRef<string[]>
   status: Ref<AsyncDataRequestStatus>
 }> => {
   const { updateTotalPokemon } = usePokemonStore()
-  const pageIsValid: ComputedRef<boolean> = computed(() => Boolean(page?.value && page.value > 0))
+  const route = useRoute()
+  const page: ComputedRef<number> = computed(() => Number(route.query.page) || 1)
+  const pageIsValid: ComputedRef<boolean> = computed(() => Boolean(route.query.page && page.value > 0))
   const offset: ComputedRef<number> = computed(() => (pageIsValid.value ? page.value - 1 : 0) * itemsPerPage)
 
   // Fetch the Pokémon data
@@ -43,14 +45,6 @@ export default async (page: Ref<number>): Promise<{
   watchEffect(() => {
     if (error.value) {
       console.error('Error fetching data in useFetchPokemonNames', error.value)
-    }
-  })
-
-  // Handle wrong page numbers
-  watchEffect(() => {
-    // Ensure the page number is valid
-    if (!pageIsValid.value) {
-      console.error('Invalid page number at useFetchPokemonNames', page.value)
     }
   })
 
