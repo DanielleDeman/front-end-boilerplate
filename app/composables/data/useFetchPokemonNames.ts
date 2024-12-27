@@ -1,13 +1,14 @@
 import type { AsyncDataRequestStatus } from '#app'
 import type { PokeAPI } from 'pokeapi-types'
 import { itemsPerPage } from '~/constants'
+import { usePokemonStore } from '~/store/pokemon'
 
 // Fetch Pokemon names from the API for a specific page
 export default async (page: Ref<number>): Promise<{
   pokemonNames: ComputedRef<string[]>
-  pokemonCount: ComputedRef<number>
   status: Ref<AsyncDataRequestStatus>
 }> => {
+  const { updateTotalPokemon } = usePokemonStore()
   const pageIsValid: ComputedRef<boolean> = computed(() => Boolean(page?.value && page.value > 0))
   const offset: ComputedRef<number> = computed(() => (pageIsValid.value ? page.value - 1 : 0) * itemsPerPage)
 
@@ -23,6 +24,12 @@ export default async (page: Ref<number>): Promise<{
       return nuxtApp.payload.data[key] || nuxtApp.static.data[key]
     },
     watch: [offset], // Watch for changes in the offset
+  }).then((result) => {
+    // Extract the Pokémon count from the result
+    if (result?.data?.value?.count) {
+      updateTotalPokemon(result.data.value.count)
+    }
+    return result
   })
 
   // Extract the Pokémon names from the result
@@ -31,9 +38,6 @@ export default async (page: Ref<number>): Promise<{
       ? [pokemon.name]
       : [])
     ?? [])
-
-  // Extract the Pokémon count from the result
-  const pokemonCount: ComputedRef<number> = computed(() => pokemonListData?.value?.count || 0)
 
   // Handle errors
   watchEffect(() => {
@@ -53,7 +57,6 @@ export default async (page: Ref<number>): Promise<{
   // Return the names of Pokemon
   return {
     pokemonNames,
-    pokemonCount,
     status,
   }
 }

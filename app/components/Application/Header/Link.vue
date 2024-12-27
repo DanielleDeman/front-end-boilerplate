@@ -8,5 +8,11 @@ const props = defineProps<{
 </script>
 
 <template>
-  <UButton :to="props.to" :label="props.label" variant="ghost" color="gray" />
+  <UButton
+    :to="props.to"
+    :label="props.label"
+    variant="ghost"
+    color="gray"
+    size="xl"
+  />
 </template>

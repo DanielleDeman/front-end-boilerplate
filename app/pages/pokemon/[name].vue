@@ -13,9 +13,9 @@ const { name } = route.params as { name: string }
 // Fetch Pokemon details
 const {
   status,
-} = await useFetchPokemonDetailSingle(name)
+} = await useFetchPokemon(name)
 
-// The array of pokemon for the current page
+// The current pokemon
 const pokemon: ComputedRef<PokeAPI.Pokemon | null> = computed(() =>
   pokemonByName.get(name) ?? null)
 </script>
@@ -29,26 +29,28 @@ const pokemon: ComputedRef<PokeAPI.Pokemon | null> = computed(() =>
       />
 
       <div v-else-if="pokemon" class="pokemon-detail">
-        <h1 class="text-3xl capitalize my-8">
+        <h1 class="text-3xl capitalize my-12">
           {{ pokemon.name }}
         </h1>
         <img
           v-if="pokemon.sprites?.other?.dream_world?.front_default"
           :src="pokemon.sprites.other.dream_world.front_default"
           alt=""
-          class="w-32 h-32 my-4"
+          class="w-32 h-32 my-12"
         >
-        <div class="my-4">
+        <div class="my-12">
           Types:
           <ul class="mb-4">
             <li v-for="type in pokemon.types" :key="`type-${type.type.name}`">
               {{ type.type.name }}
             </li>
           </ul>
-          <div class="mb-4">
-            <p>Height: {{ pokemon.height }}</p>
-            <p>Weight: {{ pokemon.weight }}</p>
-          </div>
+        </div>
+        <div class="my-12">
+          <p>Height: {{ pokemon.height }}</p>
+          <p>Weight: {{ pokemon.weight }}</p>
+        </div>
+        <div class="my-12">
           <p>Base Experience: {{ pokemon.base_experience }}</p>
         </div>
       </div>

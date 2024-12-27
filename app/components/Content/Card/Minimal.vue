@@ -7,7 +7,7 @@ defineProps<{
 </script>
 
 <template>
-  <NuxtLink :to="to">
+  <NuxtLink :to="to" class="hover:opacity-50">
     <UCard :ui="{ body: { padding: 'px-2 py-2 sm:p-3' } }">
       <div class="flex space-x-4 items-center justify-stretch">
         <div class="w-16 grow-0">
@@ -16,7 +16,7 @@ defineProps<{
         <div class="grow">
           <slot v-if="$slots.title" name="title" />
         </div>
-        <div class="grow-0">
+        <div class="grow-0 text-right">
           <slot v-if="$slots.content" name="content" />
         </div>
       </div>

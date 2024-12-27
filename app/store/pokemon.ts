@@ -5,6 +5,7 @@ export const usePokemonStore = defineStore('pokemon', {
   state: (): {
     pokemonByName: Map<string, PokeAPI.Pokemon>
     pokemonByPage: Map<number, PokeAPI.Pokemon[]>
+    totalPokemon: number
   } => ({
     /**
      * If we use the name we can also use the name in the url which is good for seo
@@ -13,22 +14,27 @@ export const usePokemonStore = defineStore('pokemon', {
      */
     pokemonByName: new Map<string, PokeAPI.Pokemon>(), // Map of name -> Pokémon object
     pokemonByPage: new Map<number, PokeAPI.Pokemon[]>(), // Map of page number -> Pokémon object array
+    totalPokemon: 0, // Total number of Pokémon in the show
   }),
   getters: {
+
     // Check if the store contains a Pokémon with a given name
     hasPokemonWithName: state => (name: string): boolean => {
       return state.pokemonByName.has(name)
     },
+
     // Check if the store contains a page of Pokémon
     hasPage: state => (page: number): boolean => {
       return state.pokemonByPage.has(page)
     },
+
     // Get a Pokémon based on its name
     getPokemonByName: state => (name: string): PokeAPI.Pokemon | undefined => {
       return state.pokemonByName.get(name)
     },
   },
   actions: {
+
     // Action to add a Pokémon
     addPokemon(pokemon: PokeAPI.Pokemon) {
       // Only add when pokemon has a name
@@ -57,6 +63,10 @@ export const usePokemonStore = defineStore('pokemon', {
         this.hasPokemonWithName(name)
           ? [this.getPokemonByName(name) as PokeAPI.Pokemon]
           : []))
+    },
+
+    updateTotalPokemon(totalPokemon: number) {
+      this.totalPokemon = totalPokemon
     },
   },
 })

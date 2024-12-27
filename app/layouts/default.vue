@@ -8,6 +8,5 @@
         <p>Oeps, er ging iets mis</p>
       </template>
     </NuxtErrorBoundary>
-    <ApplicationFooter />
   </main>
 </template>

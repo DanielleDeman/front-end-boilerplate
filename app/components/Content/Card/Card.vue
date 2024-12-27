@@ -7,12 +7,12 @@ defineProps<{
 </script>
 
 <template>
-  <NuxtLink :to="to">
+  <NuxtLink :to="to" class="hover:opacity-50">
     <UCard>
       <template #header>
         <slot v-if="$slots.title" name="title" />
       </template>
-      <div class="h-48 flex items-center justify-center">
+      <div class="h-36 flex items-center justify-center">
         <slot v-if="$slots.image" name="image" />
       </div>
       <template #footer>

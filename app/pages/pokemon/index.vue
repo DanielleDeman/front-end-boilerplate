@@ -4,7 +4,7 @@ import ContentCard from '~/components/Content/Card/Card.vue'
 import ContentCardMinimal from '~/components/Content/Card/Minimal.vue'
 import LayoutGrid from '~/components/Layout/Grid.vue'
 import LayoutList from '~/components/Layout/List.vue'
-import { maxPaginationPages } from '~/constants'
+import { itemsPerPage, maxPaginationPages } from '~/constants'
 import { useLayoutStore } from '~/store/layout'
 import { usePokemonStore } from '~/store/pokemon'
 import { LayoutTyping } from '~/types/ui'
@@ -12,19 +12,18 @@ import { LayoutTyping } from '~/types/ui'
 const currentPage = ref(1)
 
 // Stores
-const { pokemonByPage } = usePokemonStore()
+const { pokemonByPage, totalPokemon } = usePokemonStore()
 const layoutStore = useLayoutStore()
 
 // Fetch the pokemon for the current page
 const {
   pokemonNames,
-  pokemonCount,
   status,
 } = await useFetchPokemonNames(currentPage)
 
 const {
   status: statusDetails,
-} = await useFetchPokemonDetails(pokemonNames, currentPage)
+} = await useFetchPokemonList(pokemonNames, currentPage)
 
 // The merged status of the pokemon and pokemon details requests
 const {
@@ -48,7 +47,7 @@ const activeCard = computed(() =>
 <template>
   <div>
     <UContainer>
-      <div class="flex justify-between my-8">
+      <div class="flex justify-between my-12">
         <h1 class="text-3xl">
           Pokémon
         </h1>
@@ -58,10 +57,11 @@ const activeCard = computed(() =>
       <ApplicationStatus
         v-if="mergedStatus !== 'success'"
         :status="mergedStatus"
+        class="my-12"
       />
 
       <template v-else>
-        <component :is="activeLayout" :items="currentPagePokemon" layout-index="pokemon" class="my-4">
+        <component :is="activeLayout" :items="currentPagePokemon" layout-index="pokemon" class="my-12">
           <template #default="{ item }">
             <component :is="activeCard" :to="{ name: 'pokemon-name', params: { name: item?.name } }">
               <template #title>
@@ -95,13 +95,16 @@ const activeCard = computed(() =>
           </template>
         </component>
 
-        <UPagination
-          v-model="currentPage"
-          :max="maxPaginationPages"
-          :page-count="maxPaginationPages"
-          :total="pokemonCount"
-          class="my-4"
-        />
+        <ClientOnly>
+          <UPagination
+            v-if="totalPokemon && totalPokemon > itemsPerPage"
+            v-model="currentPage"
+            :max="maxPaginationPages"
+            :page-count="maxPaginationPages"
+            :total="totalPokemon"
+            class="my-12"
+          />
+        </ClientOnly>
       </template>
     </UContainer>
   </div>

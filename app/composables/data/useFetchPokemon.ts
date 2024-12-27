@@ -2,11 +2,46 @@ import type { AsyncDataRequestStatus } from '#app'
 import type { PokeAPI } from 'pokeapi-types'
 import { usePokemonStore } from '~/store/pokemon'
 
+// Fetch details for a single Pokémon from the API
+export default async (pokemonName: string): Promise<{
+  status: Ref<AsyncDataRequestStatus>
+}> => {
+  const { addPokemon, pokemonByName } = usePokemonStore()
+
+  // Fetch the Pokémon data
+  const { error, status } = await usePokemonData<PokeAPI.Pokemon>(`pokemon/${pokemonName}`, {
+    key: () => `pokemon-${pokemonName}`,
+    getCachedData(key, nuxtApp) {
+      // Use cached data if available
+      return nuxtApp.payload.data[key]
+        || nuxtApp.static.data[key]
+        || (pokemonByName.get(pokemonName) ?? undefined) // Check if the Pokémon is already in the store
+    },
+  }).then((result) => {
+    if (result?.data?.value) {
+      // Add the Pokémon to the store
+      addPokemon(result.data.value)
+    }
+    return result
+  })
+
+  // Handle errors
+  watchEffect(() => {
+    if (error.value) {
+      console.error('Error fetching data in useFetchPokemonDetailSingle', error.value)
+    }
+  })
+
+  return {
+    status,
+  }
+}
+
 // Fetch details for multiple Pokémon from the API
-export default async (pokemonNames: ComputedRef<string[]>, page?: Ref<number>): Promise<{
+export async function useFetchPokemonList(pokemonNames: ComputedRef<string[]>, page?: Ref<number>): Promise<{
   status: Ref<AsyncDataRequestStatus>
   refresh: () => Promise<void>
-}> => {
+}> {
   const { addPokemonList, hasPokemonWithName } = usePokemonStore()
 
   // If there are any Pokémon that we do not already have in the store, fetch their details and add them to the store
@@ -35,7 +70,8 @@ export default async (pokemonNames: ComputedRef<string[]>, page?: Ref<number>): 
       }), {
     getCachedData(key, nuxtApp) {
       // Use cached data if available
-      return nuxtApp.payload.data[key] || nuxtApp.static.data[key]
+      return nuxtApp.payload.data[key]
+        || nuxtApp.static.data[key]
     },
     watch: [namesToString], // Watch for changes in the Pokémon names
   })
@@ -51,38 +87,5 @@ export default async (pokemonNames: ComputedRef<string[]>, page?: Ref<number>): 
   return {
     status,
     refresh,
-  }
-}
-
-// Fetch details for a single Pokémon from the API
-export async function useFetchPokemonDetailSingle(pokemonName: string): Promise<{
-  status: Ref<AsyncDataRequestStatus>
-}> {
-  const { addPokemon } = usePokemonStore()
-
-  // Fetch the Pokémon data
-  const { error, status } = await usePokemonData<PokeAPI.Pokemon>(`pokemon/${pokemonName}`, {
-    key: () => `pokemon-${pokemonName}`,
-    getCachedData(key, nuxtApp) {
-      // Use cached data if available
-      return nuxtApp.payload.data[key] || nuxtApp.static.data[key]
-    },
-  }).then((result) => {
-    if (result?.data?.value) {
-      // Add the Pokémon to the store
-      addPokemon(result.data.value)
-    }
-    return result
-  })
-
-  // Handle errors
-  watchEffect(() => {
-    if (error.value) {
-      console.error('Error fetching data in useFetchPokemonDetailSingle', error.value)
-    }
-  })
-
-  return {
-    status,
   }
 }
