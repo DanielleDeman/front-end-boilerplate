@@ -40,8 +40,8 @@ export const useRickAndMortyStore = defineStore('rick-and-morty', {
         return
       }
 
-      // Ensure the Character list is not empty
-      if (characterList?.length) {
+      // Ensure the Character list is not empty and not already in the store
+      if (characterList?.length && !this.charactersByPage.has(page)) {
         // Add the Character details to the store
         for (const character of characterList) {
           this.addCharacter(character)

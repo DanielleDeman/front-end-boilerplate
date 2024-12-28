@@ -65,9 +65,7 @@ export async function useFetchRMCharactersByPage(): Promise<{
   })
 
   watch(data, () => {
-    console.log('inside watcher result')
     if (data?.value?.results) {
-      console.log('result', data.value.results[0]?.name, page.value)
       // Add the Pokémon to the store
       rickAndMortyStore.addCharacterList(data.value.results, page.value)
     }

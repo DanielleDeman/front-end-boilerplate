@@ -58,17 +58,21 @@ export const usePokemonStore = defineStore('pokemon', {
           this.addPokemon(pokemon)
         }
       }
-      // Once all new pokemon have been added to the store, set up the page
-      this.pokemonByPage.set(page, namesOnPage.flatMap(name =>
-        this.hasPokemonWithName(name)
-          ? [this.getPokemonByName(name) as PokeAPI.Pokemon]
-          : []))
+
+      // If the page is not already in the store, add the Pokémon to the page
+      if (!this.pokemonByPage.has(page)) {
+        // Once all new pokemon have been added to the store, set up the page
+        this.pokemonByPage.set(page, namesOnPage.flatMap(name =>
+          this.hasPokemonWithName(name)
+            ? [this.getPokemonByName(name) as PokeAPI.Pokemon]
+            : []))
+      }
     },
 
-      updateTotalPokemon(totalPokemon: number) {
-          if (totalPokemon > 0) {
-              this.totalPokemon = totalPokemon
-          }
+    updateTotalPokemon(totalPokemon: number) {
+      if (totalPokemon > 0) {
+        this.totalPokemon = totalPokemon
+      }
     },
   },
 })
