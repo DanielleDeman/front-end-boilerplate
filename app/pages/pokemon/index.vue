@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PokeAPI } from 'pokeapi-types'
-import ContentCard from '~/components/Content/Card/Card.vue'
-import ContentCardMinimal from '~/components/Content/Card/Minimal.vue'
+import ContentCard from '~/components/Card/Card.vue'
+import ContentCardMinimal from '~/components/Card/Minimal.vue'
 import LayoutGrid from '~/components/Layout/Grid.vue'
 import LayoutList from '~/components/Layout/List.vue'
 import { itemsPerPage, maxPaginationPages } from '~/constants'
@@ -9,13 +9,14 @@ import { useLayoutStore } from '~/store/layout'
 import { usePokemonStore } from '~/store/pokemon'
 import { LayoutTyping } from '~/types/ui'
 
-const currentPage = ref(1)
 
-// Add the page query param to the URL
-usePageQueryParam(currentPage)
+// Get the page from the url query param
+const {
+    currentPage
+} = usePageQueryParam()
 
 // Stores
-const { pokemonByPage, totalPokemon } = usePokemonStore()
+const pokemonStore = usePokemonStore()
 const layoutStore = useLayoutStore()
 
 // Fetch the pokemon for the current page
@@ -35,7 +36,7 @@ const {
 
 // The array of pokemon for the current page
 const currentPagePokemon: ComputedRef<PokeAPI.Pokemon[]> = computed(() =>
-  pokemonByPage.get(currentPage.value) || [])
+    pokemonStore.pokemonByPage.get(currentPage.value) || [])
 
 // The active tab and component
 const activeLayout = computed(() =>
@@ -100,10 +101,11 @@ const activeCard = computed(() =>
 
         <ClientOnly>
           <UPagination
+            v-show="pokemonStore.totalPokemon && pokemonStore.totalPokemon > itemsPerPage"
             v-model="currentPage"
             :max="maxPaginationPages"
             :page-count="itemsPerPage"
-            :total="totalPokemon"
+            :total="pokemonStore.totalPokemon"
             class="my-12"
           />
         </ClientOnly>

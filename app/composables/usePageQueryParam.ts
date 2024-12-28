@@ -1,20 +1,22 @@
-// A composable function to add the page query parameter to the route
-export default (page: Ref<number>): void => {
-  const route = useRoute()
-  const router = useRouter()
+import { validPageQueryParam } from '~/helpers/pageNumber'
 
-  // Get the page query param from the route and update the page ref to match it if it is different
-  if (route?.query?.page && Number(route.query.page) !== page.value) {
-    page.value = Number(route.query.page)
-  }
-  watch(() => page.value, () => {
-    // Ensure the page number is valid
-    if (!page.value || page.value < 1) {
-      console.error('Invalid page number at usePageQueryParam', page.value)
-    }
-    else if (page.value !== Number(route.query.page)) {
+// A composable function to add the page query parameter to the route
+export default (): {
+  currentPage: Ref<number>
+} => {
+  const route = useRoute()
+  const validPage: ComputedRef<number> = computed(() => validPageQueryParam(route.query.page as string))
+  const currentPage: Ref<number> = ref(validPage.value)
+
+  // Watch for changes to the page ref and update the page query param in the route
+  watch(() => currentPage.value, async () => {
+    if (currentPage.value !== validPage.value) {
       // Update the page query parameter in the route
-      router.push({ ...route, query: { ...route.query, page: page.value } })
+      await navigateTo({ ...route, query: { ...route.query, page: currentPage.value } })
     }
   }, { immediate: true })
+
+  return {
+    currentPage,
+  }
 }

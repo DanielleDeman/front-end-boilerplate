@@ -11,19 +11,19 @@ export const useRickAndMortyStore = defineStore('rick-and-morty', {
     charactersByPage: new Map<number, Character[]>(), // Map of page number -> Character object array
     totalCharacters: 0, // Total number of Characters in the Rick and Morty show
   }),
-    getters: {
-      
+  getters: {
+
     // Check if the store contains a Character with a given id
     hasCharacterWithId: state => (id: number): boolean => {
       return state.characterById.has(id)
-      },
-      
+    },
+
     // Check if the store contains a page of Characters
     hasPage: state => (page: number): boolean => {
       return state.charactersByPage.has(page)
     },
   },
-    actions: {
+  actions: {
     // Action to add a Character
     addCharacter(character: Character) {
       // Only add when character has an id
@@ -49,10 +49,12 @@ export const useRickAndMortyStore = defineStore('rick-and-morty', {
           this.addCharacter(character)
         }
       }
-      },
-    
-      updateTotalCharacters(totalCharacters: number) {
+    },
+
+    updateTotalCharacters(totalCharacters: number) {
+      if (totalCharacters > 0) {
         this.totalCharacters = totalCharacters
-      },
+      }
+    },
   },
 })

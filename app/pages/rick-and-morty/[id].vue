@@ -6,7 +6,7 @@ import { useRickAndMortyStore } from '~/store/rick-and-morty'
 const route = useRoute()
 
 // Stores
-const { characterById } = useRickAndMortyStore()
+const rickAndMortyStore = useRickAndMortyStore()
 
 const { id } = route.params as { id: string }
 
@@ -17,7 +17,7 @@ const {
 
 // The current character
 const character: ComputedRef<Character | null> = computed(() =>
-  characterById.get(Number(id)) ?? null)
+    rickAndMortyStore.characterById.get(Number(id)) ?? null)
 </script>
 
 <template>
@@ -29,9 +29,9 @@ const character: ComputedRef<Character | null> = computed(() =>
       />
 
       <div v-else-if="character">
-        <h1 class="text-3xl capitalize my-12">
-          {{ character.name }}
-        </h1>
+        <PageTitle>
+            {{ character.name ?? 'Character' }}
+        </PageTitle>
         <img :src="character.image" :alt="character.name" class="my-12">
         <div class="my-12">
           <p><strong>Status:</strong> {{ character.status }}</p>

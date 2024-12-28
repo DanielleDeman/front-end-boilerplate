@@ -6,7 +6,7 @@ import { usePokemonStore } from '~/store/pokemon'
 const route = useRoute()
 
 // Stores
-const { pokemonByName } = usePokemonStore()
+const pokemonStore = usePokemonStore()
 
 const { name } = route.params as { name: string }
 
@@ -17,7 +17,7 @@ const {
 
 // The current pokemon
 const pokemon: ComputedRef<PokeAPI.Pokemon | null> = computed(() =>
-  pokemonByName.get(name) ?? null)
+    pokemonStore.pokemonByName.get(name) ?? null)
 
 const pokemonImage: ComputedRef<string | null> = computed(() =>
   pokemon.value?.sprites?.other?.dream_world?.front_default
@@ -32,10 +32,10 @@ const pokemonImage: ComputedRef<string | null> = computed(() =>
         :status="status"
       />
 
-      <div v-else-if="pokemon" class="pokemon-detail">
-        <h1 class="text-3xl capitalize my-12">
-          {{ pokemon.name }}
-        </h1>
+      <template v-else-if="pokemon">
+        <PageTitle>
+          {{ pokemon?.name ?? 'Pokemon' }}
+        </PageTitle>
         <img
           v-if="pokemonImage"
           :src="pokemonImage"
@@ -57,7 +57,7 @@ const pokemonImage: ComputedRef<string | null> = computed(() =>
         <div class="my-12">
           <p>Base Experience: {{ pokemon.base_experience }}</p>
         </div>
-      </div>
+      </template>
     </UContainer>
   </div>
 </template>

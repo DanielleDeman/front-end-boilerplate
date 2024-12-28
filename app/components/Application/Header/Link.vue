@@ -11,8 +11,7 @@ const props = defineProps<{
   <UButton
     :to="props.to"
     :label="props.label"
-    variant="ghost"
-    color="gray"
+    color="blue"
     size="xl"
   />
 </template>

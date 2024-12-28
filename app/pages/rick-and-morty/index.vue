@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Character } from 'rickmortyapi'
-import ContentCard from '~/components/Content/Card/Card.vue'
-import ContentCardMinimal from '~/components/Content/Card/Minimal.vue'
+import ContentCard from '~/components/Card/Card.vue'
+import ContentCardMinimal from '~/components/Card/Minimal.vue'
 import LayoutGrid from '~/components/Layout/Grid.vue'
 import LayoutList from '~/components/Layout/List.vue'
 import { charactersPerPage, maxPaginationPages } from '~/constants'
@@ -9,13 +9,13 @@ import { useLayoutStore } from '~/store/layout'
 import { useRickAndMortyStore } from '~/store/rick-and-morty'
 import { LayoutTyping } from '~/types/ui'
 
-const currentPage = ref(1)
-
-// Add the page query param to the URL
-usePageQueryParam(currentPage)
+// Get the page from the url query param
+const {
+  currentPage,
+} = usePageQueryParam()
 
 // Stores
-const { charactersByPage, totalCharacters } = useRickAndMortyStore()
+const rickAndMortyStore = useRickAndMortyStore()
 const layoutStore = useLayoutStore()
 
 // Fetch the characters for the current page
@@ -25,7 +25,7 @@ const {
 
 // The array of characters for the current page
 const currentPageCharacters: ComputedRef<Character[]> = computed(() =>
-  charactersByPage.get(currentPage.value) || [])
+  rickAndMortyStore.charactersByPage.get(currentPage.value) || [])
 
 // The active tab and component
 const activeLayout = computed(() =>
@@ -79,10 +79,11 @@ const activeCard = computed(() =>
 
         <ClientOnly>
           <UPagination
+            v-show="rickAndMortyStore.totalCharacters && rickAndMortyStore.totalCharacters > charactersPerPage"
             v-model="currentPage"
             :max="maxPaginationPages"
             :page-count="charactersPerPage"
-            :total="totalCharacters"
+            :total="rickAndMortyStore.totalCharacters"
             class="my-12"
           />
         </ClientOnly>

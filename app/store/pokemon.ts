@@ -65,8 +65,10 @@ export const usePokemonStore = defineStore('pokemon', {
           : []))
     },
 
-    updateTotalPokemon(totalPokemon: number) {
-      this.totalPokemon = totalPokemon
+      updateTotalPokemon(totalPokemon: number) {
+          if (totalPokemon > 0) {
+              this.totalPokemon = totalPokemon
+          }
     },
   },
 })
