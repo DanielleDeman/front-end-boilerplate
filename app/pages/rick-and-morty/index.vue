@@ -38,7 +38,7 @@ const activeCard = computed(() =>
 </script>
 
 <template>
-  <div>
+  <section>
     <UContainer>
       <div class="flex justify-between my-12">
         <h1 class="text-3xl">
@@ -89,5 +89,5 @@ const activeCard = computed(() =>
         </ClientOnly>
       </template>
     </UContainer>
-  </div>
+</section>
 </template>

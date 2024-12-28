@@ -17,20 +17,20 @@ const {
 
 // The current character
 const character: ComputedRef<Character | null> = computed(() =>
-    rickAndMortyStore.characterById.get(Number(id)) ?? null)
+  rickAndMortyStore.characterById.get(Number(id)) ?? null)
 </script>
 
 <template>
-  <div>
+  <section>
     <UContainer>
       <ApplicationStatus
         v-if="status !== 'success'"
         :status="status"
       />
 
-      <div v-else-if="character">
+      <article v-else-if="character">
         <PageTitle>
-            {{ character.name ?? 'Character' }}
+          {{ character.name ?? 'Character' }}
         </PageTitle>
         <img :src="character.image" :alt="character.name" class="my-12">
         <div class="my-12">
@@ -40,7 +40,7 @@ const character: ComputedRef<Character | null> = computed(() =>
           <p><strong>Origin:</strong> {{ character.origin.name }}</p>
           <p><strong>Location:</strong> {{ character.location.name }}</p>
         </div>
-      </div>
+      </article>
     </UContainer>
-  </div>
+  </section>
 </template>

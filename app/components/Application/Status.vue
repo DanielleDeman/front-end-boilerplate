@@ -2,7 +2,7 @@
 import type { AsyncDataRequestStatus } from '#app'
 
 defineProps<{
-  status: AsyncDataRequestStatus
+  status: AsyncDataRequestStatus | undefined
 }>()
 </script>
 

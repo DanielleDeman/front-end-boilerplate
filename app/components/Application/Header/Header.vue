@@ -4,10 +4,10 @@
       <nav>
         <ul class="flex gap-2">
           <li>
-            <ApplicationHeaderLink :to="{ name: 'pokemon' }" label="Pokemon" />
+            <ApplicationHeaderLink :to="{ name: 'pokemon', query: { page: 1 } }" label="Pokemon" />
           </li>
           <li>
-            <ApplicationHeaderLink :to="{ name: 'rick-and-morty' }" label="Rick and Morty" />
+            <ApplicationHeaderLink :to="{ name: 'rick-and-morty', query: { page: 1 } }" label="Rick and Morty" />
           </li>
         </ul>
       </nav>

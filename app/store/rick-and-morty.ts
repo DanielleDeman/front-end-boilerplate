@@ -42,12 +42,13 @@ export const useRickAndMortyStore = defineStore('rick-and-morty', {
 
       // Ensure the Character list is not empty
       if (characterList?.length) {
-        // Add the Character to the page map
-        this.charactersByPage.set(page, characterList)
-
+        // Add the Character details to the store
         for (const character of characterList) {
           this.addCharacter(character)
         }
+
+        // Add the Character to the page map
+        this.charactersByPage.set(page, characterList)
       }
     },
 

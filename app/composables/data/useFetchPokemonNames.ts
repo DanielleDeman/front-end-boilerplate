@@ -1,6 +1,7 @@
 import type { AsyncDataRequestStatus } from '#app'
 import type { PokeAPI } from 'pokeapi-types'
 import { itemsPerPage } from '~/constants'
+import { validPageQueryParam } from '~/helpers/pageNumber'
 import { usePokemonStore } from '~/store/pokemon'
 
 // Fetch Pokemon names from the API for a specific page
@@ -10,7 +11,7 @@ export default async (): Promise<{
 }> => {
   const pokemonStore = usePokemonStore()
   const route = useRoute()
-  const page: ComputedRef<number> = computed(() => Number.isNaN(Number(route.query.page)) ? 1 : Number(route.query.page) || 1)
+  const page: ComputedRef<number> = computed(() => validPageQueryParam(route.query.page as string))
   const pageIsValid: ComputedRef<boolean> = computed(() => Boolean(page.value && page.value > 0))
   const offset: ComputedRef<number> = computed(() => (pageIsValid.value ? page.value - 1 : 0) * itemsPerPage)
   const pokemonNames: Ref<string[]> = ref([])
@@ -28,7 +29,7 @@ export default async (): Promise<{
     },
   })
 
-  watchEffect(() => {
+  watch(pokemonListData, () => {
     if (pokemonListData?.value?.count) {
       // Update the total number of Pokémon
       pokemonStore.updateTotalPokemon(pokemonListData.value.count)
@@ -39,14 +40,14 @@ export default async (): Promise<{
         ? [pokemon.name]
         : [])
     }
-  })
+  }, { immediate: true })
 
   watchEffect(() => {
     // Handle Pokémon not found
     if (error.value || !pokemonListData?.value?.results?.length) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Pokémon Page Not Found',
+        statusMessage: error.value?.message ?? 'Pokémon Page Not Found',
       })
     }
   })

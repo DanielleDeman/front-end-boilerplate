@@ -17,7 +17,7 @@ const {
 
 // The current pokemon
 const pokemon: ComputedRef<PokeAPI.Pokemon | null> = computed(() =>
-    pokemonStore.pokemonByName.get(name) ?? null)
+  pokemonStore.pokemonByName.get(name) ?? null)
 
 const pokemonImage: ComputedRef<string | null> = computed(() =>
   pokemon.value?.sprites?.other?.dream_world?.front_default
@@ -25,14 +25,14 @@ const pokemonImage: ComputedRef<string | null> = computed(() =>
 </script>
 
 <template>
-  <div>
+  <section>
     <UContainer>
       <ApplicationStatus
         v-if="status !== 'success'"
         :status="status"
       />
 
-      <template v-else-if="pokemon">
+      <article v-else-if="pokemon">
         <PageTitle>
           {{ pokemon?.name ?? 'Pokemon' }}
         </PageTitle>
@@ -57,7 +57,7 @@ const pokemonImage: ComputedRef<string | null> = computed(() =>
         <div class="my-12">
           <p>Base Experience: {{ pokemon.base_experience }}</p>
         </div>
-      </template>
+      </article>
     </UContainer>
-  </div>
+  </section>
 </template>

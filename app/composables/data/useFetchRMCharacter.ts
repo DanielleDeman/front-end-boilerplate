@@ -1,5 +1,6 @@
 import type { AsyncDataRequestStatus } from '#app'
 import type { Character, Info } from 'rickmortyapi'
+import { validPageQueryParam } from '~/helpers/pageNumber'
 import { useRickAndMortyStore } from '~/store/rick-and-morty'
 
 // Fetch Rick and Morty Characters from the API for a specific page
@@ -19,12 +20,12 @@ export default async (id: string): Promise<{
     },
   })
 
-  watchEffect(() => {
+  watch(data, () => {
     if (data?.value) {
       // Add the Character to the store
       rickAndMortyStore.addCharacter(data.value)
     }
-  })
+  }, { immediate: true })
 
   watchEffect(() => {
     // Handle character not found
@@ -47,7 +48,7 @@ export async function useFetchRMCharactersByPage(): Promise<{
 }> {
   const route = useRoute()
   const rickAndMortyStore = useRickAndMortyStore()
-  const page: ComputedRef<number> = computed(() => Number.isNaN(Number(route.query.page)) ? 1 : Number(route.query.page) || 1)
+  const page: ComputedRef<number> = computed(() => validPageQueryParam(route.query.page as string))
 
   // Fetch the Pokémon data
   const { data, error, status } = await useRickAndMortyData<Info<Character[]>>('character', {
@@ -63,8 +64,10 @@ export async function useFetchRMCharactersByPage(): Promise<{
     },
   })
 
-  watchEffect(() => {
+  watch(data, () => {
+    console.log('inside watcher result')
     if (data?.value?.results) {
+      console.log('result', data.value.results[0]?.name, page.value)
       // Add the Pokémon to the store
       rickAndMortyStore.addCharacterList(data.value.results, page.value)
     }
@@ -72,7 +75,7 @@ export async function useFetchRMCharactersByPage(): Promise<{
       // Update the total number of Characters
       rickAndMortyStore.updateTotalCharacters(data.value.info.count)
     }
-  })
+  }, { immediate: true })
 
   watchEffect(() => {
     // Handle character not found

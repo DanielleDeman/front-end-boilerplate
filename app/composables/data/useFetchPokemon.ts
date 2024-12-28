@@ -1,5 +1,6 @@
 import type { AsyncDataRequestStatus } from '#app'
 import type { PokeAPI } from 'pokeapi-types'
+import { validPageQueryParam } from '~/helpers/pageNumber'
 import { usePokemonStore } from '~/store/pokemon'
 
 // Fetch details for a single Pokémon from the API
@@ -9,7 +10,7 @@ export default async (pokemonName: string): Promise<{
   const pokemonStore = usePokemonStore()
 
   // Fetch the Pokémon data
-  const { data, error, status } = await usePokemonData<PokeAPI.Pokemon>(`pokemon/${pokemonName}`, {
+  const { data, status } = await usePokemonData<PokeAPI.Pokemon>(`pokemon/${pokemonName}`, {
     key: () => `pokemon-${pokemonName}`,
     getCachedData(key, nuxtApp) {
       // Use cached data if available
@@ -17,24 +18,23 @@ export default async (pokemonName: string): Promise<{
         || nuxtApp.static.data[key]
         || (pokemonStore.pokemonByName.get(pokemonName) ?? undefined) // Check if the Pokémon is already in the store
     },
+  }).then((result) => {
+    // Handle Pokémon not found
+    if (result?.error?.value || !result?.data?.value?.name) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: result?.error?.value?.message ?? 'Pokémon Not Found',
+      })
+    }
+    return result
   })
 
-  watchEffect(() => {
+  watch(data, () => {
     if (data?.value) {
       // Add the Pokémon to the store
       pokemonStore.addPokemon(data.value)
     }
-  })
-
-  watchEffect(() => {
-    // Handle Pokémon not found
-    if (error.value || !data?.value?.name) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Pokémon Not Found',
-      })
-    }
-  })
+  }, { immediate: true })
 
   return {
     status,
@@ -48,7 +48,7 @@ export async function useFetchPokemonList(pokemonNames: Ref<string[]>): Promise<
 }> {
   const route = useRoute()
   const pokemonStore = usePokemonStore()
-  const page: ComputedRef<number> = computed(() => Number.isNaN(Number(route.query.page)) ? 1 : Number(route.query.page) || 1)
+  const page: ComputedRef<number> = computed(() => validPageQueryParam(route.query.page as string))
 
   // If there are any Pokémon that we do not already have in the store, fetch their details and add them to the store
   const fetchPromises: ComputedRef<Promise<PokeAPI.Pokemon | undefined>[]> = computed(() =>
@@ -61,7 +61,7 @@ export async function useFetchPokemonList(pokemonNames: Ref<string[]>): Promise<
   const namesToString: ComputedRef<string> = computed(() => pokemonNames.value.join('-'))
 
   // Fetch multiple endpoints at once with useAsyncData
-  const { data, error, status, refresh } = await useAsyncData(`pokemonFetch-${namesToString.value}`, async () =>
+  const { status, refresh } = await useAsyncData(`pokemonFetch-${namesToString.value}`, async () =>
     await Promise.all(fetchPromises.value)
       .then((results: (PokeAPI.Pokemon | undefined)[]) => {
         // Filter out any undefined results
@@ -80,16 +80,12 @@ export async function useFetchPokemonList(pokemonNames: Ref<string[]>): Promise<
         || nuxtApp.static.data[key]
     },
     watch: [namesToString], // Watch for changes in the Pokémon names
-  })
-
-  watchEffect(() => {
-    // Handle Pokémon not found
-    if (error.value || !data?.value?.length) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Pokémon Page Not Found',
-      })
+  }).then((result) => {
+    // Handle Pokémon error
+    if (result?.error?.value) {
+      console.error('Error fetching Pokémon in useFetchPokemonDetails', result.error.value)
     }
+    return result
   })
 
   return {
