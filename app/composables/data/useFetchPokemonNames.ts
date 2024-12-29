@@ -23,7 +23,6 @@ export default async (): Promise<{
       limit: itemsPerPage,
       offset,
     },
-    client: true,
     getCachedData(key, nuxtApp) {
       // Use cached data if available
       return nuxtApp.payload.data[key]

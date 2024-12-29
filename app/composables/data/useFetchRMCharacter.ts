@@ -56,7 +56,6 @@ export async function useFetchRMCharactersByPage(): Promise<{
     query: {
       page,
     },
-    client: true,
     getCachedData(key, nuxtApp) {
       // Use cached data if available
       return nuxtApp.payload.data[key]

@@ -102,7 +102,7 @@ export default defineNuxtConfig({
         url: 'https://rickandmortyapi.com/api',
       },
     },
-    client: true,
+    client: 'always',
 
   },
 })
