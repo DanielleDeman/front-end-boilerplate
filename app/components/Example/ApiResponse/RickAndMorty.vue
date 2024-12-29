@@ -1,5 +1,7 @@
 <script setup lang="ts">
-const { data } = useRickAndMortyData('character')
+import type { Character, Info } from 'rickmortyapi'
+
+const { data } = useRickAndMortyData<Info<Character[]>>('character')
 </script>
 
 <template>
