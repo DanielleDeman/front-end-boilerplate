@@ -2,20 +2,18 @@
 import type { UseApiDataOptions } from '#build/module/nuxt-api-party'
 import type { Character, Info } from 'rickmortyapi'
 
-const page = ref(3)
-// const query = ref({
-//   page: page.value,
-// })
+const page = ref(4)
+const query = computed(() => ({
+  page: page.value,
+}))
 
 const { data, error } = await useRickAndMortyData<Info<Character[]>>('character', {
   key: () => `character-page-${page.value}`,
-  query: computed(() => ({
-    page: page.value,
-  })),
+  query,
 } as UseApiDataOptions<Info<Character[]>>)
 
 watch(data, () => {
-  console.log('rm data', data?.value?.results?.length, data?.value?.results?.[0]?.name, error?.value)
+  console.log('rm data', page.value, query.value, data?.value?.results?.length, data?.value?.results?.[0]?.name, error?.value)
 }, { immediate: true })
 </script>
 
@@ -23,7 +21,7 @@ watch(data, () => {
   <div>
     <ExampleApiResponse :response="data" />
     <UButton
-      color="blue"
+      color="green"
       size="xl"
       @click="page = page + 1"
     >
