@@ -4,19 +4,24 @@ import { validPageQueryParam } from '~/helpers/pageNumber'
 import { useRickAndMortyStore } from '~/store/rick-and-morty'
 
 // Fetch Rick and Morty Characters from the API for a specific page
-export default async (id: string): Promise<{
+export default async (): Promise<{
+  id: ComputedRef<string>
   status: Ref<AsyncDataRequestStatus>
 }> => {
   const rickAndMortyStore = useRickAndMortyStore()
+  // Route composable to get the current route
+  const route = useRoute()
+  const id: ComputedRef<string> = computed(() => (route.params as { id: string }).id)
 
   // Fetch the Character data
-  const { data, error, status } = await useRickAndMortyData<Character>(`/character/${id}`, {
-    key: () => `character-${id}`,
+  const { data, error, status } = await useRickAndMortyData<Character>(`/character/${id.value}`, {
+    key: () => `character-${id.value}`,
+    client: true,
     getCachedData(key, nuxtApp) {
       // Use cached data if available
       return nuxtApp.payload.data[key]
         || nuxtApp.static.data[key]
-        || (rickAndMortyStore.characterById.get(Number(id)) ?? undefined) // Check if the Character is already in the store
+        || (rickAndMortyStore.characterById.get(Number(id.value)) ?? undefined) // Check if the Character is already in the store
     },
   })
 
@@ -38,6 +43,7 @@ export default async (id: string): Promise<{
   })
 
   return {
+    id,
     status,
   }
 }

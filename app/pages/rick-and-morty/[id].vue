@@ -8,16 +8,15 @@ const route = useRoute()
 // Stores
 const rickAndMortyStore = useRickAndMortyStore()
 
-const { id } = route.params as { id: string }
-
 // Fetch Pokemon details
 const {
+  id,
   status,
-} = await useFetchRMCharacter(id)
+} = await useFetchRMCharacter()
 
 // The current character
 const character: ComputedRef<Character | null> = computed(() =>
-  rickAndMortyStore.characterById.get(Number(id)) ?? null)
+  rickAndMortyStore.characterById.get(Number(id.value)) ?? null)
 </script>
 
 <template>
