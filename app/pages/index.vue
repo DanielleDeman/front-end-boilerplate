@@ -6,8 +6,16 @@
           Welcome to the home page!
         </h1>
       </header>
-      <div class="grid gap-4 xl:grid-cols-2">
+      <div>
         <p>Have a good time reviewing my code!</p>
+      </div>
+      <div class="grid gap-4 xl:grid-cols-2">
+        <section title="Rick and Morty API response">
+          <ExampleApiResponseRickAndMorty />
+        </section>
+        <section title="Pokemon API response">
+          <ExampleApiResponsePokemon />
+        </section>
       </div>
     </UContainer>
   </div>
