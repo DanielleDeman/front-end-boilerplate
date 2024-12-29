@@ -3,9 +3,9 @@ import type { UseApiDataOptions } from '#build/module/nuxt-api-party'
 import type { Character, Info } from 'rickmortyapi'
 
 const { data } = await useRickAndMortyData<Info<Character[]>>('character', {
-  key: () => 'character-page-1',
+  key: () => 'character-page-2',
   query: {
-    page: 1,
+    page: 2,
   },
 } as UseApiDataOptions<Info<Character[]>>)
 </script>
