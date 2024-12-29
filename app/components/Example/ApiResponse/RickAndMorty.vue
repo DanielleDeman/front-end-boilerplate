@@ -7,15 +7,15 @@ const page = ref(3)
 //   page: page.value,
 // })
 
-const { data } = await useRickAndMortyData<Info<Character[]>>('character', {
+const { data, error } = await useRickAndMortyData<Info<Character[]>>('character', {
   key: () => `character-page-${page.value}`,
-  query: {
-    page,
-  },
+  query: computed(() => ({
+    page: page.value,
+  })),
 } as UseApiDataOptions<Info<Character[]>>)
 
 watch(data, () => {
-  console.log('rm data', data?.value?.results?.[0]?.name)
+  console.log('rm data', data?.value?.results?.length, data?.value?.results?.[0]?.name, error?.value)
 }, { immediate: true })
 </script>
 
