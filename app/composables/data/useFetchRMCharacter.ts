@@ -53,9 +53,9 @@ export async function useFetchRMCharactersByPage(): Promise<{
   // Fetch the Pokémon data
   const { data, error, status } = await useRickAndMortyData<Info<Character[]>>('character', {
     key: () => `character-page-${page.value}`,
-    query: computed(() => ({
-      page: page.value,
-    })),
+    query: {
+        page,
+      },
     getCachedData(key, nuxtApp) {
       // Use cached data if available
       return nuxtApp.payload.data[key]

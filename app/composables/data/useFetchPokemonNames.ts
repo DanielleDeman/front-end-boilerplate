@@ -19,10 +19,10 @@ export default async (): Promise<{
   // Fetch the Pokémon data
   const { data: pokemonListData, error, status } = await usePokemonData<PokeAPI.NamedAPIResourceList | null>('pokemon', {
     key: () => `pokemon-list-${page.value}`,
-    query: computed(() => ({
+    query: {
       limit: itemsPerPage,
-      offset: offset.value,
-    })),
+      offset,
+    },
     getCachedData(key, nuxtApp) {
       // Use cached data if available
       return nuxtApp.payload.data[key]
