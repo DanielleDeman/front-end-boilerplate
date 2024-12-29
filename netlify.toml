@@ -1,3 +1,8 @@
+[[headers]]
+for = "/*"
+  [headers.values]
+  cache-control = "no-cache"
+  
 [build]
 publish = "dist"
 command = "pnpm run build"
