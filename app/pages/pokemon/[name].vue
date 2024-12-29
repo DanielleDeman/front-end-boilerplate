@@ -2,22 +2,18 @@
 import type { PokeAPI } from 'pokeapi-types'
 import { usePokemonStore } from '~/store/pokemon'
 
-// Route composable to get the current route
-const route = useRoute()
-
 // Stores
 const pokemonStore = usePokemonStore()
 
-const { name } = route.params as { name: string }
-
 // Fetch Pokemon details
 const {
+  pokemonName,
   status,
-} = await useFetchPokemon(name)
+} = await useFetchPokemon()
 
 // The current pokemon
 const pokemon: ComputedRef<PokeAPI.Pokemon | null> = computed(() =>
-  pokemonStore.pokemonByName.get(name) ?? null)
+  pokemonStore.pokemonByName.get(pokemonName.value) ?? null)
 
 const pokemonImage: ComputedRef<string | null> = computed(() =>
   pokemon.value?.sprites?.other?.dream_world?.front_default

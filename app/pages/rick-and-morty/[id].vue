@@ -2,9 +2,6 @@
 import type { Character } from 'rickmortyapi'
 import { useRickAndMortyStore } from '~/store/rick-and-morty'
 
-// Route composable to get the current route
-const route = useRoute()
-
 // Stores
 const rickAndMortyStore = useRickAndMortyStore()
 

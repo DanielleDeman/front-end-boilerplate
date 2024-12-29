@@ -17,7 +17,7 @@ export default async (): Promise<{
   const pokemonNames: Ref<string[]> = ref([])
 
   // Fetch the Pokémon data
-  const { data: pokemonListData, error, status } = await usePokemonData<PokeAPI.NamedAPIResourceList | null>('pokemon', {
+  const { data: pokemonListData, status } = await usePokemonData<PokeAPI.NamedAPIResourceList | null>('pokemon', {
     key: () => `pokemon-list-${page.value}`,
     query: {
       limit: itemsPerPage,
@@ -32,29 +32,27 @@ export default async (): Promise<{
   })
 
   watch(pokemonListData, () => {
-    if (pokemonListData?.value?.count) {
-      // Update the total number of Pokémon
-      pokemonStore.updateTotalPokemon(pokemonListData.value.count)
+    // Handle Pokémon not found
+    if (!pokemonListData?.value?.results?.length) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Pokémon Page Not Found',
+      })
     }
-    if (pokemonListData?.value?.results) {
-      // Extract the Pokémon names from the result
-      pokemonNames.value = pokemonListData.value.results.flatMap(pokemon => pokemon.name
-        ? [pokemon.name]
-        : [])
+    else {
+      if (pokemonListData?.value?.count) {
+        // Update the total number of Pokémon
+        pokemonStore.updateTotalPokemon(pokemonListData.value.count)
+      }
+      if (pokemonListData?.value?.results) {
+        // Extract the Pokémon names from the result
+        pokemonNames.value = pokemonListData.value.results.flatMap(pokemon => pokemon.name
+          ? [pokemon.name]
+          : [])
+      }
     }
   }, { immediate: true })
 
-  watchEffect(() => {
-    // Handle Pokémon not found
-    if (error.value || !pokemonListData?.value?.results?.length) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: error.value?.message ?? 'Pokémon Page Not Found',
-      })
-    }
-  })
-
-  // Return the names of Pokemon
   return {
     pokemonNames,
     status,

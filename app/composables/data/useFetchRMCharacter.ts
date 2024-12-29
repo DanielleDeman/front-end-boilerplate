@@ -4,17 +4,17 @@ import { validPageQueryParam } from '~/helpers/pageNumber'
 import { useRickAndMortyStore } from '~/store/rick-and-morty'
 
 // Fetch Rick and Morty Characters from the API for a specific page
-export default async (): Promise<{
+export async function useFetchRMCharacter(): Promise<{
   id: ComputedRef<string>
   status: Ref<AsyncDataRequestStatus>
-}> => {
+}> {
   const rickAndMortyStore = useRickAndMortyStore()
   // Route composable to get the current route
   const route = useRoute()
   const id: ComputedRef<string> = computed(() => (route.params as { id: string }).id)
 
   // Fetch the Character data
-  const { data, error, status } = await useRickAndMortyData<Character>(`/character/${id.value}`, {
+  const { data, status } = await useRickAndMortyData<Character>(`/character/${id.value}`, {
     key: () => `character-${id.value}`,
     client: true,
     getCachedData(key, nuxtApp) {
@@ -26,21 +26,18 @@ export default async (): Promise<{
   })
 
   watch(data, () => {
-    if (data?.value) {
-      // Add the Character to the store
-      rickAndMortyStore.addCharacter(data.value)
-    }
-  }, { immediate: true })
-
-  watchEffect(() => {
     // Handle character not found
-    if (error.value || !data?.value?.id) {
+    if (!data?.value?.id) {
       throw createError({
         statusCode: 404,
         statusMessage: 'Character Not Found',
       })
     }
-  })
+    else if (data?.value) {
+      // Add the Character to the store
+      rickAndMortyStore.addCharacter(data.value)
+    }
+  }, { immediate: true })
 
   return {
     id,
@@ -48,7 +45,7 @@ export default async (): Promise<{
   }
 }
 
-// Fetch Rick and Morty Character from the API with a specific id
+// Fetch Rick and Morty character from the API with a specific id
 export async function useFetchRMCharactersByPage(): Promise<{
   status: Ref<AsyncDataRequestStatus>
 }> {
@@ -56,8 +53,8 @@ export async function useFetchRMCharactersByPage(): Promise<{
   const rickAndMortyStore = useRickAndMortyStore()
   const page: ComputedRef<number> = computed(() => validPageQueryParam(route.query.page as string))
 
-  // Fetch the Pokémon data
-  const { data, error, status } = await useRickAndMortyData<Info<Character[]>>('character', {
+  // Fetch the character data
+  const { data, status } = await useRickAndMortyData<Info<Character[]>>('character', {
     key: () => `character-page-${page.value}`,
     query: {
       page,
@@ -71,26 +68,24 @@ export async function useFetchRMCharactersByPage(): Promise<{
   })
 
   watch(data, () => {
-    if (data?.value?.results) {
-      // Add the Character to the store
-      rickAndMortyStore.addCharacterList(data.value.results, page.value)
+    // Handle characters not found
+    if ((data?.value?.results && !data.value.results.length)) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Character Page Not Found',
+      })
     }
-    if (data?.value?.info?.count) {
-      // Update the total number of Characters
-      rickAndMortyStore.updateTotalCharacters(data.value.info.count)
+    else {
+      if (data?.value?.results) {
+        // Add the character to the store
+        rickAndMortyStore.addCharacterList(data.value.results, page.value)
+      }
+      if (data?.value?.info?.count) {
+        // Update the total number of characters
+        rickAndMortyStore.updateTotalCharacters(data.value.info.count)
+      }
     }
   }, { immediate: true })
-
-  watchEffect(() => {
-    // Handle Characters not found
-    if (error?.value || (data?.value?.results && !data.value.results.length)) {
-      console.error(`Character Page Not Found ${page.value}, ${data?.value?.results?.length}`, error?.value)
-      //   throw createError({
-      //     statusCode: 404,
-      //     statusMessage: result?.error?.value?.message ?? `Character Page Not Found ${page.value}, ${result?.data?.value?.results?.length}`,
-      //   })
-    }
-  })
 
   return {
     status,
