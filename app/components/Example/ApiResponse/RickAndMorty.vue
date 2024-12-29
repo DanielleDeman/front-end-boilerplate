@@ -14,4 +14,7 @@ const { data } = await useRickAndMortyData<Info<Character[]>>('character', {
 
 <template>
   <ExampleApiResponse :response="data" />
+  <button @click="page++">
+    next
+  </button>
 </template>
