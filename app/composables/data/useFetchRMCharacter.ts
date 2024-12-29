@@ -51,7 +51,7 @@ export async function useFetchRMCharactersByPage(): Promise<{
   const page: ComputedRef<number> = computed(() => validPageQueryParam(route.query.page as string))
 
   // Fetch the Pokémon data
-  const { data, error, status } = await useRickAndMortyData<Info<Character[]>>('character', {
+  const { data, status } = await useRickAndMortyData<Info<Character[]>>('character', {
     key: () => `character-page-${page.value}`,
     query: {
       page,
@@ -62,11 +62,20 @@ export async function useFetchRMCharactersByPage(): Promise<{
         || nuxtApp.static.data[key]
         || (rickAndMortyStore.charactersByPage.get(page.value) ?? undefined) // Check if the Characters are already in the store
     },
+  }).then((result) => {
+    // Handle Characters not found
+    if (result?.error?.value || !result?.data?.value?.results?.length) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: result?.error?.value?.message ?? 'Character Page Not Found',
+      })
+    }
+    return result
   })
 
   watch(data, () => {
     if (data?.value?.results) {
-      // Add the Pokémon to the store
+      // Add the Character to the store
       rickAndMortyStore.addCharacterList(data.value.results, page.value)
     }
     if (data?.value?.info?.count) {
@@ -74,16 +83,6 @@ export async function useFetchRMCharactersByPage(): Promise<{
       rickAndMortyStore.updateTotalCharacters(data.value.info.count)
     }
   }, { immediate: true })
-
-  watchEffect(() => {
-    // Handle character not found
-    if (error.value || !data?.value?.results?.length) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Character Page Not Found',
-      })
-    }
-  })
 
   return {
     status,
