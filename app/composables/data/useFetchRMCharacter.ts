@@ -67,7 +67,7 @@ export async function useFetchRMCharactersByPage(): Promise<{
     if (result?.error?.value || !result?.data?.value?.results?.length) {
       throw createError({
         statusCode: 404,
-        statusMessage: result?.error?.value?.message ?? 'Character Page Not Found',
+        statusMessage: result?.error?.value?.message ?? `Character Page Not Found ${page.value}, ${result?.data?.value?.results?.length}`,
       })
     }
     return result
