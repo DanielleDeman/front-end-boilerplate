@@ -17,7 +17,7 @@ export default async (pokemonName: string): Promise<{
       return nuxtApp.payload.data[key]
         || nuxtApp.static.data[key]
         || (pokemonStore.pokemonByName.get(pokemonName) ?? undefined) // Check if the Pokémon is already in the store
-    },
+      },
   }).then((result) => {
     // Handle Pokémon not found
     if (result?.error?.value || !result?.data?.value?.name) {

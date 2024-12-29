@@ -9,6 +9,7 @@ const { data, error } = await useRickAndMortyData<Info<Character[]>>('character'
   query: {
     page,
   },
+  client: true,
 } as UseApiDataOptions<Info<Character[]>>)
 
 watch(data, () => {
